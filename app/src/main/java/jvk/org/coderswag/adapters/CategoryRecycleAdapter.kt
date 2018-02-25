@@ -10,13 +10,15 @@ import android.widget.TextView
 import jvk.org.coderswag.R
 import jvk.org.coderswag.model.Category
 
-class CategoryRecycleAdapter(val context: Context,
-                             val categories: List<Category>) :
+class CategoryRecycleAdapter(private val context: Context,
+                             private val categories: List<Category>,
+                             private val itemClick: (Category) -> Unit) :
         RecyclerView.Adapter<CategoryRecycleAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(this.context).inflate(R.layout.category_list_item, parent, false)
-        return ViewHolder(view)
+        val view = LayoutInflater.from(this.context)
+                .inflate(R.layout.category_list_item, parent, false)
+        return ViewHolder(view, itemClick)
     }
 
     override fun getItemCount(): Int {
@@ -27,14 +29,15 @@ class CategoryRecycleAdapter(val context: Context,
         holder?.bindCategory(this.categories[position], this.context)
     }
 
-    inner class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
-        val categoryImage = itemView?.findViewById<ImageView>(R.id.categoryImage)
-        val categoryName = itemView?.findViewById<TextView>(R.id.categoryTitle)
+    inner class ViewHolder(itemView: View?, private val itemClick: (Category) -> Unit) : RecyclerView.ViewHolder(itemView) {
+        private val categoryImage = itemView?.findViewById<ImageView>(R.id.categoryImage)
+        private val categoryName = itemView?.findViewById<TextView>(R.id.categoryTitle)
 
         fun bindCategory(category: Category, context: Context) {
             val resourceId = context.resources.getIdentifier(category.image, "drawable", context.packageName)
-            categoryImage?.setImageResource(resourceId)
-            categoryName?.text = category.title
+            this.categoryImage?.setImageResource(resourceId)
+            this.categoryName?.text = category.title
+            itemView.setOnClickListener { this.itemClick(category) }
         }
 
     }
